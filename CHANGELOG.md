@@ -1,5 +1,11 @@
 # FFI utils - Change Log
 
+## [0.8.0]
+- Update to dual license (MIT/BSD)
+- Upgrade unwrap version to 1.2.0
+- Use rust 1.28.0 stable / 2018-07-07 nightly
+- rustfmt 0.99.2 and clippy-0.0.212
+
 ## [0.7.0]
 - Add a public helper function `catch_unwind_result` for synchronous APIs (in addition to `catch_unwind_cb` for async)
 
