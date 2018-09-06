@@ -37,8 +37,7 @@ macro_rules! jni_unwrap {
 macro_rules! gen_ctx {
     ($env:ident, $cb:ident) => {
         {
-            let ctx = unwrap!($env.new_global_ref($cb));
-            unwrap!($env.delete_local_ref($cb));
+            let ctx = jni_unwrap!($env.new_global_ref($cb));
             let ptr = *ctx.as_obj() as *mut c_void;
             mem::forget(ctx);
             ptr
@@ -48,16 +47,12 @@ macro_rules! gen_ctx {
     ($env:ident, $cb0:ident, $($cb_rest:ident),+ ) => {
         {
             let ctx = [
-                Some(unwrap!($env.new_global_ref($cb0))),
+                Some(jni_unwrap!($env.new_global_ref($cb0))),
                 $(
-                    Some(unwrap!($env.new_global_ref($cb_rest))),
+                    Some(jni_unwrap!($env.new_global_ref($cb_rest))),
                 )+
             ];
             let ctx = Box::into_raw(Box::new(ctx)) as *mut c_void;
-            unwrap!($env.delete_local_ref($cb0));
-            $(
-                unwrap!($env.delete_local_ref($cb_rest));
-            )+
             ctx
         }
     }
