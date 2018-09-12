@@ -10,7 +10,7 @@
 //! Java/JNI utilities.
 
 use jni::errors::Error as JniError;
-use jni::objects::{GlobalRef, JObject};
+use jni::objects::{GlobalRef, JObject, AutoLocal};
 use jni::sys::{jobject, jsize};
 use jni::JNIEnv;
 use std::os::raw::c_void;
@@ -78,10 +78,10 @@ macro_rules! gen_primitive_type_converter {
 
 #[macro_export]
 macro_rules! gen_object_array_converter {
-    ($native_type:ident, $java_ty_name:expr) => {
+    ($class_loader:expr, $native_type:ident, $java_ty_name:expr) => {
         impl<'a, 'b> ToJava<'a, JObject<'a>> for &'b [$native_type] {
             fn to_java(&self, env: &'a JNIEnv) -> JniResult<JObject<'a>> {
-                object_array_to_java($native_type::to_java, self, env, $java_ty_name)
+                object_array_to_java($class_loader, $native_type::to_java, self, env, $java_ty_name)
             }
         }
     };
@@ -119,14 +119,17 @@ pub fn object_array_to_java<
     'a,
     T,
     F: Fn(&T, &'a JNIEnv) -> JniResult<U>,
+    C: Fn(&'a JNIEnv, &str) -> AutoLocal<'a>,
     U: Into<JObject<'a>> + 'a,
 >(
+    class_loader: C,
     transform_fn: F,
     list: &[T],
     env: &'a JNIEnv,
     class: &str,
 ) -> JniResult<JObject<'a>> {
-    let output = env.new_object_array(list.len() as jsize, class, JObject::null())?;
+    let cls = class_loader(env, class);
+    let output = env.new_object_array(list.len() as jsize, &cls, JObject::null())?;
 
     for (idx, entry) in list.iter().enumerate() {
         let jentry = transform_fn(entry, env)?.into();
