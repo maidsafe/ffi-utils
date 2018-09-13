@@ -1,5 +1,8 @@
 # FFI utils - Change Log
 
+## [0.9.0]
+- Support providing custom class loader in Java/JNI routines and macros
+
 ## [0.8.0]
 - Update to dual license (MIT/BSD)
 - Upgrade unwrap version to 1.2.0
