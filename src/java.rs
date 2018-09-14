@@ -18,16 +18,20 @@ use std::os::raw::c_void;
 /// Result returning JNI errors
 pub type JniResult<T> = Result<T, JniError>;
 
-/// Unwraps the results and checks for Java exceptions.
+/// Unwraps the results and checks for Java exceptions or other errors.
+/// Returns from the function call and passes the exception handling to
+/// Java in case of an exception.
 /// Required for exceptions pass-through (simplifies debugging).
 #[macro_export]
 macro_rules! jni_unwrap {
     ($res:expr) => {{
         let res: Result<_, JniError> = $res;
-        if let Err(JniError(ErrorKind::JavaException, _)) = res {
-            return;
-        } else {
-            unwrap!(res)
+        match res {
+            Ok(val) => val,
+            Err(e) => {
+                error!("{:?}", e);
+                return;
+            }
         }
     }};
 }
@@ -81,7 +85,15 @@ macro_rules! gen_object_array_converter {
     ($class_loader:expr, $native_type:ident, $java_ty_name:expr) => {
         impl<'a, 'b> ToJava<'a, JObject<'a>> for &'b [$native_type] {
             fn to_java(&self, env: &'a JNIEnv) -> JniResult<JObject<'a>> {
-                object_array_to_java($class_loader, $native_type::to_java, self, env, $java_ty_name)
+                unsafe {
+                    object_array_to_java(
+                        $class_loader,
+                        $native_type::to_java,
+                        self,
+                        env,
+                        $java_ty_name,
+                    )
+                }
             }
         }
     };
@@ -115,20 +127,14 @@ macro_rules! gen_byte_array_converter {
 }
 
 /// Converts object arrays into Java arrays
-pub fn object_array_to_java<
-    'a,
-    T,
-    F: Fn(&T, &'a JNIEnv) -> JniResult<U>,
-    C: Fn(&'a JNIEnv, &str) -> AutoLocal<'a>,
-    U: Into<JObject<'a>> + 'a,
->(
-    class_loader: C,
-    transform_fn: F,
+pub unsafe fn object_array_to_java<'a, T, U: Into<JObject<'a>> + 'a>(
+    class_loader: unsafe fn(&'a JNIEnv, &str) -> JniResult<AutoLocal<'a>>,
+    transform_fn: fn(&T, &'a JNIEnv) -> JniResult<U>,
     list: &[T],
     env: &'a JNIEnv,
     class: &str,
 ) -> JniResult<JObject<'a>> {
-    let cls = class_loader(env, class);
+    let cls = class_loader(env, class)?;
     let output = env.new_object_array(list.len() as jsize, &cls, JObject::null())?;
 
     for (idx, entry) in list.iter().enumerate() {
@@ -140,6 +146,6 @@ pub fn object_array_to_java<
 }
 
 /// Converts `user_data` back into a Java callback object
-pub unsafe fn convert_cb_from_java(env: &JNIEnv, ctx: *mut c_void) -> GlobalRef {
-    GlobalRef::from_raw(unwrap!(env.get_java_vm()), ctx as jobject)
+pub unsafe fn convert_cb_from_java(env: &JNIEnv, ctx: *mut c_void) -> JniResult<GlobalRef> {
+    Ok(GlobalRef::from_raw(env.get_java_vm()?, ctx as jobject))
 }
