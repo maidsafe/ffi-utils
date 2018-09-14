@@ -10,13 +10,46 @@
 //! Java/JNI utilities.
 
 use jni::errors::Error as JniError;
-use jni::objects::{GlobalRef, JObject, AutoLocal};
+use jni::objects::{AutoLocal, GlobalRef, JObject};
 use jni::sys::{jobject, jsize};
-use jni::JNIEnv;
+use jni::{AttachGuard, JNIEnv, JavaVM};
 use std::os::raw::c_void;
 
 /// Result returning JNI errors
 pub type JniResult<T> = Result<T, JniError>;
+
+/// Tries to get the `JNIEnv` structure. If we happen to execute in the context
+/// of a Java thread, we just reuse it (`Auto`). If we are in the context of a
+/// native thread, then we will attach it to JVM by calling `attach_current_thread`
+/// and it will be automatically detached when it goes out of scope (`Manual`).
+pub enum EnvGuard<'a> {
+    /// Automatically obtained `JNIEnv`. We do not need to detach it.
+    Auto(JNIEnv<'a>),
+    /// `JNIEnv` obtained through `attach_current_thread`.
+    /// It will be automatically detached from the current thread when it gets out
+    /// of its scope.
+    Manual(AttachGuard<'a>),
+}
+
+impl<'a> EnvGuard<'a> {
+    /// Initialise `EnvGuard` out of a `JavaVM` reference.
+    /// We also check if the reference is valid and return an error if it is not.
+    pub fn new(vm: Option<&'a JavaVM>) -> JniResult<Self> {
+        let vm = vm.ok_or_else(|| JniError::from("no JVM reference found"))?;
+        Ok(match vm.get_env() {
+            Ok(env) => EnvGuard::Auto(env),
+            Err(_) => EnvGuard::Manual(vm.attach_current_thread()?),
+        })
+    }
+
+    /// Return `JNIEnv` that we obtained.
+    pub fn env(&self) -> &JNIEnv {
+        match self {
+            EnvGuard::Auto(env) => &env,
+            EnvGuard::Manual(guard) => &*guard,
+        }
+    }
+}
 
 /// Unwraps the results and checks for Java exceptions or other errors.
 /// Returns from the function call and passes the exception handling to
