@@ -11,7 +11,7 @@ version = "0.9.0"
 
 [dependencies]
 base64 = "~0.9.0"
-jni = "~0.10.1"
+jni = { version = "~0.10.2", optional = true }
 log = "~0.4.1"
 regex = "~0.2.5"
 serde = "~1.0.27"
@@ -21,3 +21,7 @@ walkdir = "~2.0.1"
 
 [dev-dependencies]
 rand = "~0.4.2"
+
+[features]
+# Includes utilities for dealing with the JNI runtime.
+java = ["jni"]

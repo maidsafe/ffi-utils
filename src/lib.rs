@@ -73,6 +73,7 @@
 )]
 
 extern crate base64;
+#[cfg(feature = "java")]
 extern crate jni;
 #[macro_use]
 extern crate log;
@@ -91,6 +92,7 @@ mod vec;
 
 pub mod bindgen_utils;
 pub mod callback;
+#[cfg(feature = "java")]
 pub mod java;
 pub mod string;
 pub mod test_utils;
