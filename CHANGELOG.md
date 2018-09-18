@@ -1,5 +1,10 @@
 # FFI utils - Change Log
 
+## [0.10.0]
+- Make the `java` module feature-gated. This should optimise build times for dependent crates which don't require Java/JNI support
+- Add a new helper enum `EnvGuard` that simplifies JNI env management (acquiring, holding the reference, and deallocating it automatically)
+- Make JNI code safer and cleaner
+
 ## [0.9.0]
 - Support providing custom class loader in Java/JNI routines and macros
 
