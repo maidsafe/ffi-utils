@@ -173,6 +173,7 @@ pub unsafe fn object_array_to_java<'a, T, U: Into<JObject<'a>> + 'a>(
     for (idx, entry) in list.iter().enumerate() {
         let jentry = transform_fn(entry, env)?.into();
         env.set_object_array_element(output, idx as i32, jentry)?;
+        env.delete_local_ref(jentry)?;
     }
 
     Ok(JObject::from(output))
