@@ -1,5 +1,9 @@
 # FFI utils - Change Log
 
+## [0.11.0]
+- Fix leaking local references in the Java module. Because the Android local reference table is limited to 512
+  entries it is important to deallocate the local references as soon as possible.
+
 ## [0.10.0]
 - Make the `java` module feature-gated. This should optimise build times for dependent crates which don't require Java/JNI support
 - Add a new helper enum `EnvGuard` that simplifies JNI env management (acquiring, holding the reference, and deallocating it automatically)
