@@ -43,8 +43,7 @@ macro_rules! ffi_result_code {
 #[macro_export]
 macro_rules! ffi_error_code {
     ($err:expr) => {{
-        #[cfg_attr(feature = "cargo-clippy", allow(useless_attribute))]
-        #[allow(unused)]
+        #[allow(unused, clippy::useless_attribute)]
         use $crate::ErrorCode;
 
         let err = &$err;

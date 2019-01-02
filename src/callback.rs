@@ -75,9 +75,7 @@ pub trait CallbackArgs {
 }
 
 impl CallbackArgs for () {
-    fn default() -> Self {
-        ()
-    }
+    fn default() -> Self {}
 }
 
 impl CallbackArgs for bool {
