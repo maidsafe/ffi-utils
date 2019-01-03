@@ -9,7 +9,7 @@
 
 //! Utilities for passing strings across FFI boundaries.
 
-use repr_c::ReprC;
+use crate::repr_c::ReprC;
 use std::error::Error;
 use std::ffi::{CStr, IntoStringError, NulError};
 use std::os::raw::c_char;

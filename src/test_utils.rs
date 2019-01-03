@@ -10,7 +10,7 @@
 //! Test utilities.
 
 use super::FfiResult;
-use repr_c::ReprC;
+use crate::repr_c::ReprC;
 use std::fmt::Debug;
 use std::os::raw::c_void;
 use std::ptr;
