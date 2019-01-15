@@ -1,16 +1,13 @@
-# FFI utils
+# FFI Utils
 
-| [![](http://meritbadge.herokuapp.com/ffi_utils)](https://crates.io/crates/ffi_utils) | [![Documentation](https://docs.rs/ffi_utils/badge.svg)](https://docs.rs/ffi_utils) |
-|:----------:|:----------:|
+|Crate|Documentation|Linux/OS X|Windows|Issues|
+|:---:|:-----------:|:--------:|:-----:|:----:|
+|[![](http://meritbadge.herokuapp.com/ffi_utils)](https://crates.io/crates/ffi_utils)|[![Documentation](https://docs.rs/ffi_utils/badge.svg)](https://docs.rs/ffi_utils)|[![Build Status](https://travis-ci.org/maidsafe/ffi_utils.svg?branch=master)](https://travis-ci.org/maidsafe/ffi_utils)|[![Build status](https://ci.appveyor.com/api/projects/status/ex53u3atx6sqm9f2/branch/master?svg=true)](https://ci.appveyor.com/project/MaidSafe-QA/ffi-utils-u7qyi/branch/master)|[![Stories in Ready](https://badge.waffle.io/maidsafe/ffi_utils.png?label=ready&title=Ready)](https://waffle.io/maidsafe/ffi_utils)|
+
+| [MaidSafe website](https://maidsafe.net) | [SAFE Dev Forum](https://forum.safedev.org) | [SAFE Network Forum](https://safenetforum.org) |
+|:----------------------------------------:|:-------------------------------------------:|:----------------------------------------------:|
 
 This crate contains utilities to be consumed by crates interfacing with other languages via FFI. It also contains utilities for testing in FFI scenarios which get compiled only during testing.
-
-## Build Instructions
-
-```
-cargo build
-cargo test
-```
 
 ## License
 
