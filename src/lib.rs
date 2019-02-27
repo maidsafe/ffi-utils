@@ -64,7 +64,6 @@
     clippy::use_debug
 )]
 
-use base64;
 #[cfg(feature = "java")]
 extern crate jni;
 #[macro_use]
