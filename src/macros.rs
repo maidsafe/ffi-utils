@@ -30,6 +30,7 @@ macro_rules! ffi_result {
     };
 }
 
+/// Convert a result into an i32 error code.
 #[macro_export]
 macro_rules! ffi_result_code {
     ($res:expr) => {
@@ -40,6 +41,7 @@ macro_rules! ffi_result_code {
     };
 }
 
+/// Convert an error into an i32 error code.
 #[macro_export]
 macro_rules! ffi_error_code {
     ($err:expr) => {{
@@ -55,6 +57,7 @@ macro_rules! ffi_error_code {
     }};
 }
 
+/// Convert a result into an `FfiResult` and call a callback.
 #[macro_export]
 macro_rules! call_result_cb {
     ($result:expr, $user_data:expr, $cb:expr) => {
@@ -70,6 +73,8 @@ macro_rules! call_result_cb {
     };
 }
 
+/// Given a result, calls the callback if it is an error, otherwise produces the wrapped value.
+/// Should be called within `catch_unwind`, so returns `None` on error.
 #[macro_export]
 macro_rules! try_cb {
     ($result:expr, $user_data:expr, $cb:expr) => {
