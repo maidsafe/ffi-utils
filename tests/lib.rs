@@ -71,9 +71,8 @@ extern crate unwrap;
 #[test]
 fn basic() {
     use ffi_utils::test_utils::{call_1, TestError};
-    use ffi_utils::{catch_unwind_cb, FfiResult, OpaqueCtx};
+    use ffi_utils::{catch_unwind_cb, FfiResult, OpaqueCtx, FFI_RESULT_OK};
     use std::os::raw::c_void;
-    use std::ptr;
 
     // A typical FFI function. Returns `input_param * 42`.
     #[no_mangle]
@@ -91,12 +90,7 @@ fn basic() {
                 panic!();
             }
 
-            let result = FfiResult {
-                error_code: 0,
-                description: ptr::null(),
-            };
-
-            o_callback(user_data.0, &result, output);
+            o_callback(user_data.0, FFI_RESULT_OK, output);
 
             Ok(())
         })
