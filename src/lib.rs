@@ -7,7 +7,7 @@
 // specific language governing permissions and limitations relating to use of the SAFE Network
 // Software.
 
-//! FFI utilities
+//! FFI utilities.
 
 #![doc(
     html_logo_url = "https://raw.githubusercontent.com/maidsafe/QA/master/Images/maidsafe_logo.png",
