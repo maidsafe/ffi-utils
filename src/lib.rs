@@ -72,18 +72,22 @@ mod repr_c;
 mod vec;
 
 pub mod bindgen_utils;
+#[macro_use]
 pub mod callback;
 #[cfg(feature = "java")]
 pub mod java;
+pub mod result;
 pub mod string;
 pub mod test_utils;
 
 pub use self::b64::{base64_decode, base64_encode};
 pub use self::catch_unwind::{catch_unwind_cb, catch_unwind_result};
 pub use self::repr_c::ReprC;
+pub use self::result::{FfiResult, NativeResult, FFI_RESULT_OK};
 pub use self::string::{from_c_str, StringError};
 pub use self::vec::{vec_clone_from_raw_parts, vec_into_raw_parts, SafePtr};
-use std::os::raw::{c_char, c_void};
+
+use std::os::raw::c_void;
 
 /// Type that holds opaque user data handed into FFI functions.
 #[derive(Clone, Copy)]
@@ -101,19 +105,3 @@ pub trait ErrorCode {
     /// Return the error code corresponding to this instance.
     fn error_code(&self) -> i32;
 }
-
-/// FFI result wrapper.
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct FfiResult {
-    /// Unique error code.
-    pub error_code: i32,
-    /// Error description.
-    pub description: *const c_char,
-}
-
-/// Constant value to be used for OK result.
-pub const FFI_RESULT_OK: &FfiResult = &FfiResult {
-    error_code: 0,
-    description: 0 as *const c_char,
-};
