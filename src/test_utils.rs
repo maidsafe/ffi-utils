@@ -10,13 +10,12 @@
 //! Test utilities.
 
 use crate::repr_c::ReprC;
-use std::fmt::Debug;
 use crate::{ErrorCode, FfiResult};
+use std::fmt::{Debug, Display};
 use std::os::raw::c_void;
-use std::ptr;
-use std::slice;
 use std::sync::mpsc::{self, Sender};
 use unwrap::unwrap;
+use std::{fmt, ptr, slice};
 
 /// User data wrapper.
 pub struct UserData {
@@ -325,5 +324,40 @@ extern "C" fn callback_vec_u8(
 
 /// Unsafe wrapper for passing non-Send types through mpsc channels.
 /// Use with caution!
-pub struct SendWrapper<T>(T);
+pub struct SendWrapper<T>(pub T);
 unsafe impl<T> Send for SendWrapper<T> {}
+
+/// Dummy error type for testing that implements ErrorCode.
+#[derive(Debug)]
+pub enum TestError {
+    /// Error from a string.
+    FromStr(String),
+    /// Simple test error.
+    Test,
+}
+
+impl<'a> From<&'a str> for TestError {
+    fn from(s: &'a str) -> Self {
+        TestError::FromStr(s.into())
+    }
+}
+
+impl ErrorCode for TestError {
+    fn error_code(&self) -> i32 {
+        use TestError::*;
+        match *self {
+            Test => -1,
+            FromStr(_) => -2,
+        }
+    }
+}
+
+impl Display for TestError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use TestError::*;
+        match self {
+            Test => write!(f, "Test Error"),
+            FromStr(s) => write!(f, "{}", s),
+        }
+    }
+}

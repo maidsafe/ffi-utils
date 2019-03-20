@@ -48,7 +48,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::fmt;
+    use crate::test_utils::TestError;
     use crate::FfiResult;
 
     #[test]
@@ -103,28 +103,6 @@ mod tests {
             if let Some(f) = self.0.take() {
                 f()
             }
-        }
-    }
-
-    // Dummy error type for testing.
-    #[derive(Debug)]
-    struct TestError;
-
-    impl<'a> From<&'a str> for TestError {
-        fn from(_: &'a str) -> Self {
-            TestError
-        }
-    }
-
-    impl ErrorCode for TestError {
-        fn error_code(&self) -> i32 {
-            -1
-        }
-    }
-
-    impl Display for TestError {
-        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-            write!(f, "Test Error")
         }
     }
 }
