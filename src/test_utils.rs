@@ -9,9 +9,9 @@
 
 //! Test utilities.
 
-use super::FfiResult;
 use crate::repr_c::ReprC;
 use std::fmt::Debug;
+use crate::{ErrorCode, FfiResult};
 use std::os::raw::c_void;
 use std::ptr;
 use std::slice;

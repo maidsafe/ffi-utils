@@ -8,7 +8,8 @@
 // Software.
 
 use super::callback::{Callback, CallbackArgs};
-use super::{ErrorCode, FfiResult};
+use super::{ErrorCode, NativeResult};
+use crate::result;
 use std::fmt::{Debug, Display};
 use std::os::raw::c_void;
 use std::panic::{self, AssertUnwindSafe};
@@ -34,11 +35,12 @@ where
     E: Debug + Display + ErrorCode + From<&'a str>,
 {
     if let Err(err) = catch_unwind_result(f) {
-        let (error_code, description) = ffi_result!(Err::<(), E>(err));
-        let res = FfiResult {
+        let (error_code, description) = result::ffi_result(Err::<(), E>(err));
+        let res = unwrap!(NativeResult {
             error_code,
-            description: description.as_ptr(),
-        };
+            description: Some(description),
+        }
+        .into_repr_c());
         cb.call(user_data.into(), &res, CallbackArgs::default());
     }
 }
@@ -47,6 +49,7 @@ where
 mod tests {
     use super::*;
     use std::fmt;
+    use crate::FfiResult;
 
     #[test]
     fn panic_inside_catch_unwind_result() {
