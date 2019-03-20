@@ -104,7 +104,7 @@ where
     cb.call(user_data.into(), &res, CallbackArgs::default());
 }
 
-/// Convert an error into a pair of `(error_code, description)` to be used in `FfiResult`.
+/// Convert an error into a pair of `(error_code, description)` to be used in `NativeResult`.
 pub fn ffi_error<E>(err: E) -> (i32, String)
 where
     E: Debug + Display + ErrorCode,
@@ -126,7 +126,7 @@ where
     err_code
 }
 
-/// Convert a result into a pair of `(error_code, description)` to be used in `FfiResult`.
+/// Convert a result into a pair of `(error_code, description)` to be used in `NativeResult`.
 pub fn ffi_result<E, T>(res: Result<T, E>) -> (i32, String)
 where
     E: Debug + Display + ErrorCode,
