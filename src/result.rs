@@ -96,12 +96,23 @@ where
     E: Debug + Display + ErrorCode,
 {
     let (error_code, description) = ffi_result(result);
-    let res = unwrap!(NativeResult {
+    let res = NativeResult {
         error_code,
         description: Some(description),
     }
-    .into_repr_c());
-    cb.call(user_data.into(), &res, CallbackArgs::default());
+    .into_repr_c();
+
+    match res {
+        Ok(res) => cb.call(user_data.into(), &res, CallbackArgs::default()),
+        Err(_) => {
+            let res = FfiResult {
+                error_code,
+                description: b"Could not convert error description into CString\x00" as *const u8
+                    as *const _,
+            };
+            cb.call(user_data.into(), &res, CallbackArgs::default());
+        }
+    }
 }
 
 /// Convert an error into a pair of `(error_code, description)` to be used in `NativeResult`.

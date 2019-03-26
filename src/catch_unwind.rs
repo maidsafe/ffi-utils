@@ -8,7 +8,7 @@
 // Software.
 
 use super::callback::{Callback, CallbackArgs};
-use super::{ErrorCode, NativeResult};
+use super::{ErrorCode, FfiResult, NativeResult};
 use crate::result;
 use std::fmt::{Debug, Display};
 use std::os::raw::c_void;
@@ -36,12 +36,23 @@ where
 {
     if let Err(err) = catch_unwind_result(f) {
         let (error_code, description) = result::ffi_result(Err::<(), E>(err));
-        let res = unwrap!(NativeResult {
+        let res = NativeResult {
             error_code,
             description: Some(description),
         }
-        .into_repr_c());
-        cb.call(user_data.into(), &res, CallbackArgs::default());
+        .into_repr_c();
+
+        match res {
+            Ok(res) => cb.call(user_data.into(), &res, CallbackArgs::default()),
+            Err(_) => {
+                let res = FfiResult {
+                    error_code,
+                    description: b"Could not convert error description into CString\x00"
+                        as *const u8 as *const _,
+                };
+                cb.call(user_data.into(), &res, CallbackArgs::default());
+            }
+        }
     }
 }
 

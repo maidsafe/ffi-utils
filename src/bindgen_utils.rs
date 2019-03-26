@@ -14,7 +14,7 @@ use std::io;
 use std::path::Path;
 use walkdir::WalkDir;
 
-/// Recursively copy all files with the given extension from the source to the targt directories.
+/// Recursively copy all files with the given extension from the source to the target directories.
 pub fn copy_files<S: AsRef<Path>, T: AsRef<Path>>(
     source: S,
     target: T,
