@@ -16,6 +16,7 @@ use std::os::raw::c_void;
 use std::ptr;
 use std::slice;
 use std::sync::mpsc::{self, Sender};
+use unwrap::unwrap;
 
 /// User data wrapper.
 pub struct UserData {
