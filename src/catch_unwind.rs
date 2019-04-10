@@ -9,7 +9,6 @@
 
 use super::callback::{Callback, CallbackArgs};
 use super::{ErrorCode, FfiResult, NativeResult};
-use crate::result;
 use std::fmt::{Debug, Display};
 use std::os::raw::c_void;
 use std::panic::{self, AssertUnwindSafe};
@@ -35,7 +34,7 @@ where
     E: Debug + Display + ErrorCode + From<&'a str>,
 {
     if let Err(err) = catch_unwind_result(f) {
-        let (error_code, description) = result::ffi_result(Err::<(), E>(err));
+        let (error_code, description) = ffi_result!(Err::<(), E>(err));
         let res = NativeResult {
             error_code,
             description: Some(description),

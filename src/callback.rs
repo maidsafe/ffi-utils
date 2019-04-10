@@ -13,21 +13,6 @@ use crate::result::FfiResult;
 use std::os::raw::c_void;
 use std::ptr;
 
-/// Given a result, calls the callback if it is an error, otherwise produces the wrapped value.
-/// Should be called within `catch_unwind`, so returns `None` on error.
-#[macro_export]
-macro_rules! try_cb {
-    ($result:expr, $user_data:expr, $cb:expr) => {
-        match $result {
-            Ok(value) => value,
-            e @ Err(_) => {
-                result::call_result_cb(e, $user_data, $cb);
-                return None;
-            }
-        }
-    };
-}
-
 /// This trait allows us to treat callbacks with different number and type of arguments uniformly.
 pub trait Callback {
     /// Arguments for the callback. Should be a tuple.

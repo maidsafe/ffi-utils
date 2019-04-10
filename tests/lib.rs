@@ -65,6 +65,8 @@
 )]
 
 #[macro_use]
+extern crate ffi_utils;
+#[macro_use]
 extern crate unwrap;
 
 // Test the basic example from our "FFI calling conventions" doc.
@@ -113,7 +115,7 @@ fn basic() {
 // Test the utility functions as covered in "FFI calling conventions".
 #[test]
 fn utility_functions() {
-    use ffi_utils::result::call_result_cb;
+    use ffi_utils::call_result_cb;
     use ffi_utils::test_utils::TestError;
     use ffi_utils::{catch_unwind_cb, FfiResult, NativeResult, OpaqueCtx, FFI_RESULT_OK};
     use std::os::raw::c_void;
@@ -141,7 +143,9 @@ fn utility_functions() {
         catch_unwind_cb(user_data, o_callback, || -> Result<_, TestError> {
             match multiply_by_42(input_param) {
                 Ok(output) => o_callback(user_data.0, FFI_RESULT_OK, output),
-                Err(e) => call_result_cb(Err::<(), _>(e), user_data, o_callback),
+                Err(e) => {
+                    call_result_cb!(Err::<(), _>(e), user_data, o_callback);
+                }
             }
 
             Ok(())
