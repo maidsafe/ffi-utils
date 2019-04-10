@@ -9,13 +9,10 @@
 
 //! Utilities for handling results and errors across the FFI boundary.
 
-use crate::callback::{Callback, CallbackArgs};
 use crate::string::{self, StringError};
-use crate::{ErrorCode, ReprC};
-use log::debug;
+use crate::ReprC;
 use std::ffi::CString;
-use std::fmt::{Debug, Display};
-use std::os::raw::{c_char, c_void};
+use std::os::raw::c_char;
 use std::ptr;
 
 /// Constant value to be used for OK result.
@@ -86,75 +83,5 @@ impl Drop for FfiResult {
                 let _ = CString::from_raw(self.description as *mut _);
             }
         }
-    }
-}
-
-/// Convert a result into an `FfiResult` and call a callback.
-pub fn call_result_cb<E, T, U>(result: Result<T, E>, user_data: U, cb: impl Callback)
-where
-    U: Into<*mut c_void>,
-    E: Debug + Display + ErrorCode,
-{
-    let (error_code, description) = ffi_result(result);
-    let res = NativeResult {
-        error_code,
-        description: Some(description),
-    }
-    .into_repr_c();
-
-    match res {
-        Ok(res) => cb.call(user_data.into(), &res, CallbackArgs::default()),
-        Err(_) => {
-            let res = FfiResult {
-                error_code,
-                description: b"Could not convert error description into CString\x00" as *const u8
-                    as *const _,
-            };
-            cb.call(user_data.into(), &res, CallbackArgs::default());
-        }
-    }
-}
-
-/// Convert an error into a pair of `(error_code, description)` to be used in `NativeResult`.
-pub fn ffi_error<E>(err: E) -> (i32, String)
-where
-    E: Debug + Display + ErrorCode,
-{
-    let err_code = ffi_error_code(&err);
-    let err_desc = format!("{}", err);
-    (err_code, err_desc)
-}
-
-/// Convert an error into an i32 error code.
-pub fn ffi_error_code<E>(err: &E) -> i32
-where
-    E: Debug + ErrorCode,
-{
-    let err_str = format!("{:?}", err);
-    let err_code = err.error_code();
-
-    debug!("**ERRNO: {}** {}", err_code, err_str);
-    err_code
-}
-
-/// Convert a result into a pair of `(error_code, description)` to be used in `NativeResult`.
-pub fn ffi_result<E, T>(res: Result<T, E>) -> (i32, String)
-where
-    E: Debug + Display + ErrorCode,
-{
-    match res {
-        Ok(_) => (0, String::default()),
-        Err(error) => ffi_error(error),
-    }
-}
-
-/// Convert a result into an i32 error code.
-pub fn ffi_result_code<E, T>(res: Result<T, E>) -> i32
-where
-    E: Debug + ErrorCode,
-{
-    match res {
-        Ok(_) => 0,
-        Err(error) => ffi_error_code(&error),
     }
 }

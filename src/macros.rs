@@ -7,27 +7,30 @@
 // specific language governing permissions and limitations relating to use of the SAFE Network
 // Software.
 
-/// Converts a result into a pair of `(error_code: i32, description: CString)`
-/// to be used in `FfiResult`
+//! FFI macros.
+//!
+//! Because the `debug!` log output provides helpful information about FFI errors, these macros
+//! cannot be functions. Otherwise we lose some debug data like the line and column numbers and
+//! module name.
+
+/// Convert an error into a pair of `(error_code: i32, description: String)` to be used in
+/// `NativeResult`.
 #[macro_export]
 macro_rules! ffi_error {
-    ($error:expr) => {{
-        let err_code = ffi_error_code!($error);
-        let err_desc = format!("{}", $error);
-        (
-            err_code,
-            unwrap::unwrap!(::std::ffi::CString::new(err_desc)),
-        )
+    ($err:expr) => {{
+        let err_code = ffi_error_code!($err);
+        let err_desc = format!("{}", $err);
+        (err_code, err_desc)
     }};
 }
 
-/// Converts a result into a pair of `(error_code: i32, description: CString)`
-/// to be used in `FfiResult`
+/// Convert a result into a pair of `(error_code: i32, description: String)` to be used in
+/// `NativeResult`.
 #[macro_export]
 macro_rules! ffi_result {
     ($res:expr) => {
         match $res {
-            Ok(_) => (0, ::std::ffi::CString::default()),
+            Ok(_) => (0, String::default()),
             Err(error) => ffi_error!(error),
         }
     };
@@ -67,12 +70,25 @@ macro_rules! call_result_cb {
         #[cfg_attr(feature = "cargo-clippy", allow(useless_attribute))]
         #[allow(unused)]
         use $crate::callback::{Callback, CallbackArgs};
+
         let (error_code, description) = ffi_result!($result);
-        let res = FfiResult {
+        let res = NativeResult {
             error_code,
-            description: description.as_ptr(),
-        };
-        $cb.call($user_data.into(), &res, CallbackArgs::default());
+            description: Some(description),
+        }
+        .into_repr_c();
+
+        match res {
+            Ok(res) => $cb.call($user_data.into(), &res, CallbackArgs::default()),
+            Err(_) => {
+                let res = FfiResult {
+                    error_code,
+                    description: b"Could not convert error description into CString\x00"
+                        as *const u8 as *const _,
+                };
+                $cb.call($user_data.into(), &res, CallbackArgs::default());
+            }
+        }
     };
 }
 

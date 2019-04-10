@@ -72,7 +72,6 @@ mod repr_c;
 mod vec;
 
 pub mod bindgen_utils;
-#[macro_use]
 pub mod callback;
 #[cfg(feature = "java")]
 pub mod java;

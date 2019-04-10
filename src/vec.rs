@@ -11,16 +11,14 @@ use std::mem;
 use std::ptr;
 use std::slice;
 
-/// Provides FFI-safe pointers, as opposed to raw `as_ptr()` in
-/// `Vec` and `String` which can return values such as `0x01` that
-/// can cause segmentation faults with the automatic pointer
+/// Provides FFI-safe pointers, as opposed to raw `as_ptr()` in `Vec` and `String` which can return
+/// values such as `0x01` that can cause segmentation faults with the automatic pointer
 /// dereferencing on the front-end side (e.g. in Node.js).
 pub trait SafePtr {
     /// Resulting pointer type.
     type Ptr;
 
-    /// Returns a pointer that guarantees safe dereferencing
-    /// on the front-end side.
+    /// Returns a pointer that guarantees safe dereferencing on the front-end side.
     fn as_safe_ptr(&self) -> *const Self::Ptr;
 }
 

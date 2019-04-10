@@ -14,8 +14,8 @@ use crate::{ErrorCode, FfiResult};
 use std::fmt::{Debug, Display};
 use std::os::raw::c_void;
 use std::sync::mpsc::{self, Sender};
-use unwrap::unwrap;
 use std::{fmt, ptr, slice};
+use unwrap::unwrap;
 
 /// User data wrapper.
 pub struct UserData {
