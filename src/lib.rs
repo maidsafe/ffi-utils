@@ -64,15 +64,6 @@
     clippy::use_debug
 )]
 
-#[cfg(feature = "java")]
-extern crate jni;
-#[macro_use]
-extern crate log;
-#[macro_use]
-extern crate serde_derive;
-#[macro_use]
-extern crate unwrap;
-
 #[macro_use]
 mod macros;
 mod b64;

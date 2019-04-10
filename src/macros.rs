@@ -14,7 +14,10 @@ macro_rules! ffi_error {
     ($error:expr) => {{
         let err_code = ffi_error_code!($error);
         let err_desc = format!("{}", $error);
-        (err_code, unwrap!(::std::ffi::CString::new(err_desc)))
+        (
+            err_code,
+            unwrap::unwrap!(::std::ffi::CString::new(err_desc)),
+        )
     }};
 }
 
@@ -52,7 +55,7 @@ macro_rules! ffi_error_code {
         let err_str = format!("{:?}", err);
         let err_code = err.error_code();
 
-        debug!("**ERRNO: {}** {}", err_code, err_str);
+        log::debug!("**ERRNO: {}** {}", err_code, err_str);
         err_code
     }};
 }

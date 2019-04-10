@@ -10,6 +10,7 @@
 //! Utilities for passing strings across FFI boundaries.
 
 use crate::repr_c::ReprC;
+use serde_derive::{Deserialize, Serialize};
 use std::error::Error;
 use std::ffi::{CStr, IntoStringError, NulError};
 use std::os::raw::c_char;

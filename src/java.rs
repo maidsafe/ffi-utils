@@ -113,6 +113,7 @@ macro_rules! gen_primitive_type_converter {
     };
 }
 
+/// Generate a `ToJava` impl that converts a slice of structures (`&[Foo]`) into a Java object array (`Foo[]`).
 #[macro_export]
 macro_rules! gen_object_array_converter {
     ($class_loader:expr, $native_type:ident, $java_ty_name:expr) => {
@@ -132,6 +133,7 @@ macro_rules! gen_object_array_converter {
     };
 }
 
+/// Generate a `ToJava` impl that converts a byte array (`[u8; 32]`) into a Java byte array (`byte[]`).
 #[macro_export]
 macro_rules! gen_byte_array_converter {
     ($arr_type:ty, $size:expr) => {
