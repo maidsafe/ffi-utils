@@ -72,7 +72,7 @@ extern crate unwrap;
 // Test the basic example from our "FFI calling conventions" doc.
 #[test]
 fn basic() {
-    use ffi_utils::test_utils::{call_1, TestError};
+    use ffi_utils::test_utils::TestError;
     use ffi_utils::{catch_unwind_cb, FfiResult, OpaqueCtx, FFI_RESULT_OK};
     use std::os::raw::c_void;
 
@@ -98,17 +98,22 @@ fn basic() {
         })
     }
 
-    // Test success case.
-    let val: i32 = unsafe { unwrap!(call_1(|ud, cb| foreign_function(1, ud, cb))) };
-    assert_eq!(val, 42);
+    // Test the example.
+    {
+        use ffi_utils::test_utils::call_1;
 
-    // Test catching a panic.
-    let res: Result<i32, i32> =
-        unsafe { call_1(|ud, cb| foreign_function(::std::i32::MAX, ud, cb)) };
-    match res {
-        Ok(value) => panic!("Unexpected value: {:?}", value),
-        Err(-2) => (),
-        Err(e) => panic!("Unexpected error: {:?}", e),
+        // Test success case.
+        let val: i32 = unsafe { unwrap!(call_1(|ud, cb| foreign_function(1, ud, cb))) };
+        assert_eq!(val, 42);
+
+        // Test catching a panic.
+        let res: Result<i32, i32> =
+            unsafe { call_1(|ud, cb| foreign_function(::std::i32::MAX, ud, cb)) };
+        match res {
+            Ok(value) => panic!("Unexpected value: {:?}", value),
+            Err(-2) => (),
+            Err(e) => panic!("Unexpected error: {:?}", e),
+        }
     }
 }
 
@@ -117,9 +122,8 @@ fn basic() {
 fn utility_functions() {
     use ffi_utils::call_result_cb;
     use ffi_utils::test_utils::TestError;
-    use ffi_utils::{catch_unwind_cb, FfiResult, NativeResult, OpaqueCtx, FFI_RESULT_OK};
+    use ffi_utils::{catch_unwind_cb, FfiResult, OpaqueCtx, FFI_RESULT_OK};
     use std::os::raw::c_void;
-    use utils::call_1_ffi_result;
 
     // Function that returns a Result.
     fn multiply_by_42(input_param: i32) -> Result<i32, TestError> {
@@ -152,21 +156,27 @@ fn utility_functions() {
         })
     }
 
-    // Test success case.
-    let val: i32 = unsafe { unwrap!(call_1_ffi_result(|ud, cb| foreign_function2(1, ud, cb))) };
-    assert_eq!(val, 42);
+    // Test the example.
+    {
+        use ffi_utils::NativeResult;
+        use utils::call_1_ffi_result;
 
-    // Test error case.
-    let res: Result<i32, NativeResult> =
-        unsafe { call_1_ffi_result(|ud, cb| foreign_function2(::std::i32::MAX, ud, cb)) };
-    match res {
-        Ok(_) => panic!("Unexpected value"),
-        Err(native_result) => {
-            assert_eq!(native_result.error_code, -2);
-            assert_eq!(
-                native_result.description,
-                Some("Overflow detected and prevented".into())
-            );
+        // Test success case.
+        let val: i32 = unsafe { unwrap!(call_1_ffi_result(|ud, cb| foreign_function2(1, ud, cb))) };
+        assert_eq!(val, 42);
+
+        // Test error case.
+        let res: Result<i32, NativeResult> =
+            unsafe { call_1_ffi_result(|ud, cb| foreign_function2(::std::i32::MAX, ud, cb)) };
+        match res {
+            Ok(_) => panic!("Unexpected value"),
+            Err(native_result) => {
+                assert_eq!(native_result.error_code, -2);
+                assert_eq!(
+                    native_result.description,
+                    Some("Overflow detected and prevented".into())
+                );
+            }
         }
     }
 }
