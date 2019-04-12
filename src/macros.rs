@@ -70,6 +70,7 @@ macro_rules! call_result_cb {
         #[cfg_attr(feature = "cargo-clippy", allow(useless_attribute))]
         #[allow(unused)]
         use $crate::callback::{Callback, CallbackArgs};
+        use $crate::result::{FfiResult, NativeResult};
 
         let (error_code, description) = ffi_result!($result);
         let res = NativeResult {
