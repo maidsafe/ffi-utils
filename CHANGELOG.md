@@ -1,5 +1,15 @@
 # FFI utils - Change Log
 
+## [0.12.0]
+- Use stable rustc, clippy, and rustfmt
+- Upgrade crate to Rust 2018 edition
+- Fix compiler and clippy errors
+- Update jni to 0.12.0
+- Introduce `NativeResult` type
+- Change macros to interface with `NativeResult`
+- Move `TestError` to test_utils.rs
+- Add `ReprC` implementation for `i32` and `i64` types
+
 ## [0.11.0]
 - Fix leaking local references in the Java module. Because the Android local reference table is limited to 512
   entries it is important to deallocate the local references as soon as possible.
