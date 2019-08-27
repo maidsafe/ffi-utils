@@ -20,12 +20,15 @@ impl ReprC for String {
     type C = *const c_char;
     type Error = StringError;
 
-    unsafe fn clone_from_repr_c(c_repr: Self::C) -> Result<String, StringError> {
-        Ok(if c_repr.is_null() {
-            String::default()
-        } else {
-            from_c_str(c_repr)?
-        })
+    unsafe fn clone_from_repr_c(c_repr: Self::C) -> Result<Self, Self::Error> {
+        if c_repr.is_null() {
+            // Return an error instead of an empty String, as a null pointer input is most likely a
+            // logic error in the consuming code.
+            return Err(StringError::Null(
+                "String could not be constructed from C null pointer".to_owned(),
+            ));
+        }
+        Ok(CStr::from_ptr(c_repr).to_str()?.to_owned())
     }
 }
 
@@ -56,15 +59,4 @@ impl From<IntoStringError> for StringError {
     fn from(e: IntoStringError) -> Self {
         StringError::IntoString(e.description().to_owned())
     }
-}
-
-/// Copies memory from a provided pointer and allocates a new `String`.
-#[inline]
-pub unsafe fn from_c_str(ptr: *const c_char) -> Result<String, StringError> {
-    if ptr.is_null() {
-        return Err(StringError::Null(
-            "String could not be constructed from C null pointer".to_owned(),
-        ));
-    }
-    Ok(CStr::from_ptr(ptr).to_str()?.to_owned())
 }
