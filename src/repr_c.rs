@@ -8,6 +8,15 @@
 // Software.
 
 //! FFI tools.
+//!
+//! We implement all primitive types that have been needed in SAFE projects so far. More can be
+//! implemented if needed, with the following exceptions, which should not be implemented:
+//!
+//! + `bool`: This doesn't seem to be safe to pass over the FFI directly. Should be converted to a
+//! type such as `u32` instead.
+//! + `char`: It's not clear why this would be necessary. You'd probably want to convert to `u32`
+//! for better ABI stability.
+//! + `i128` and `u128`: do not have a stable ABI, so they cannot be returned across the FFI.
 
 /// Trait to convert between FFI and Rust representations of types.
 pub trait ReprC {

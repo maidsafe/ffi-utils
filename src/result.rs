@@ -9,7 +9,7 @@
 
 //! Utilities for handling results and errors across the FFI boundary.
 
-use crate::string::{self, StringError};
+use crate::string::StringError;
 use crate::ReprC;
 use std::ffi::CString;
 use std::os::raw::c_char;
@@ -60,7 +60,7 @@ impl ReprC for NativeResult {
             description: if description.is_null() {
                 None
             } else {
-                Some(string::from_c_str(description).map_err(StringError::from)?)
+                Some(String::clone_from_repr_c(description).map_err(StringError::from)?)
             },
         })
     }
