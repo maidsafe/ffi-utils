@@ -22,8 +22,7 @@ script:
   - set -x;
     cargo fmt -- --check &&
     cargo check --release &&
-    cargo clippy --release &&
-    cargo clippy --release --profile=test &&
-    cargo test --release --verbose
+    cargo clippy --release --all-targets &&
+    cargo test --release --verbose --features java
 before_cache:
   - cargo prune

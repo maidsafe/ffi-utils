@@ -58,11 +58,15 @@ impl<'a> EnvGuard<'a> {
 #[macro_export]
 macro_rules! jni_unwrap {
     ($res:expr) => {{
-        let res: Result<_, JniError> = $res;
+        use log::error;
+        use $crate::java::JniResult;
+
+        let res: JniResult<_> = $res;
         match res {
             Ok(val) => val,
             Err(e) => {
                 error!("{:?}", e);
+
                 return;
             }
         }
@@ -98,7 +102,13 @@ macro_rules! gen_ctx {
 /// Generates primitive type converters
 #[macro_export]
 macro_rules! gen_primitive_type_converter {
-    ($native_type:ty, $java_type:ty) => {
+    ($native_type:ty, $java_type:ty) => {{
+        #![allow(trivial_numeric_casts)]
+
+        use jni::JNIEnv;
+        use $crate::java::JniResult;
+        // use $crate::java::{FromJava, JniResult, ToJava};
+
         impl FromJava<$java_type> for $native_type {
             fn from_java(_env: &JNIEnv, input: $java_type) -> JniResult<Self> {
                 Ok(input as Self)
@@ -110,10 +120,11 @@ macro_rules! gen_primitive_type_converter {
                 Ok(*self as $java_type)
             }
         }
-    };
+    }};
 }
 
-/// Generate a `ToJava` impl that converts a slice of structures (`&[Foo]`) into a Java object array (`Foo[]`).
+/// Generate a `ToJava` impl that converts a slice of structures (`&[Foo]`) into a Java object array
+/// (`Foo[]`).
 #[macro_export]
 macro_rules! gen_object_array_converter {
     ($class_loader:expr, $native_type:ident, $java_ty_name:expr) => {
@@ -133,10 +144,20 @@ macro_rules! gen_object_array_converter {
     };
 }
 
-/// Generate a `ToJava` impl that converts a byte array (`[u8; 32]`) into a Java byte array (`byte[]`).
+/// Generate a `ToJava` impl that converts a byte array (`[u8; 32]`) into a Java byte array
+/// (`byte[]`).
 #[macro_export]
 macro_rules! gen_byte_array_converter {
-    ($arr_type:ty, $size:expr) => {
+    ($arr_type:ty, $size:expr) => {{
+        #![allow(trivial_casts)]
+
+        use jni::objects::JObject;
+        use jni::sys::{jbyteArray, jobject, jsize};
+        use jni::JNIEnv;
+        use std::{cmp, mem, slice};
+        use $crate::java::JniResult;
+        // use $crate::java::{FromJava, JniResult, ToJava};
+
         impl<'a> FromJava<JObject<'a>> for [$arr_type; $size] {
             fn from_java(env: &JNIEnv, input: JObject) -> JniResult<Self> {
                 let input = input.into_inner() as jbyteArray;
@@ -145,6 +166,7 @@ macro_rules! gen_byte_array_converter {
                 let len = env.get_array_length(input)? as usize;
                 env.get_byte_array_region(input, 0, &mut output[0..cmp::min(len, $size)])?;
 
+                #[allow(clippy::useless_transmute)]
                 Ok(unsafe { mem::transmute(output) })
             }
         }
@@ -158,7 +180,7 @@ macro_rules! gen_byte_array_converter {
                 Ok(JObject::from(output as jobject))
             }
         }
-    };
+    }};
 }
 
 /// Converts object arrays into Java arrays
@@ -184,4 +206,35 @@ pub unsafe fn object_array_to_java<'a, T, U: Into<JObject<'a>> + 'a>(
 /// Converts `user_data` back into a Java callback object
 pub unsafe fn convert_cb_from_java(env: &JNIEnv, ctx: *mut c_void) -> JniResult<GlobalRef> {
     Ok(GlobalRef::from_raw(env.get_java_vm()?, ctx as jobject))
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn macros() {
+        // TODO: Remove these two traits.
+        // See https://github.com/maidsafe/safe_client_libs/issues/1031.
+        trait ToJava<'a, T: Sized + 'a> {
+            fn to_java(&self, env: &'a jni::JNIEnv) -> super::JniResult<T>;
+        }
+        trait FromJava<T> {
+            fn from_java(env: &jni::JNIEnv, input: T) -> super::JniResult<Self>
+            where
+                Self: Sized;
+        }
+
+        jni_unwrap!(Ok(()));
+
+        gen_primitive_type_converter!(u8, jni::sys::jbyte);
+        gen_primitive_type_converter!(i32, jni::sys::jint);
+        gen_primitive_type_converter!(u32, jni::sys::jint);
+        gen_primitive_type_converter!(i64, jni::sys::jlong);
+        gen_primitive_type_converter!(u64, jni::sys::jlong);
+
+        gen_byte_array_converter!(i8, 8);
+        gen_byte_array_converter!(u8, 24);
+        gen_byte_array_converter!(u8, 32);
+        gen_byte_array_converter!(u8, 48);
+        gen_byte_array_converter!(u8, 64);
+    }
 }

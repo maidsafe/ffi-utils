@@ -51,7 +51,7 @@ macro_rules! ffi_result_code {
 #[macro_export]
 macro_rules! ffi_error_code {
     ($err:expr) => {{
-        #[allow(unused, clippy::useless_attribute)]
+        #[allow(unused_imports, clippy::useless_attribute)]
         use $crate::ErrorCode;
 
         let err = &$err;
@@ -67,8 +67,7 @@ macro_rules! ffi_error_code {
 #[macro_export]
 macro_rules! call_result_cb {
     ($result:expr, $user_data:expr, $cb:expr) => {
-        #[cfg_attr(feature = "cargo-clippy", allow(useless_attribute))]
-        #[allow(unused)]
+        #[allow(unused_imports, clippy::useless_attribute)]
         use $crate::callback::{Callback, CallbackArgs};
         use $crate::result::{FfiResult, NativeResult};
 
