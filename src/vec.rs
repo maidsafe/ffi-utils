@@ -34,17 +34,48 @@ impl<T> SafePtr for Vec<T> {
     }
 }
 
-/// Converts a pointer and lengths to Vec<T> by cloning the contents.
+/// Consumes a `Vec` and transfers ownership of the data to a C caller, returning (pointer, size).
+///
+/// The pointer which this function returns must be returned to Rust and reconstituted using
+/// `vec_from_raw_parts` to be properly deallocated. Specifically, one should not use the standard C
+/// `free()` function to deallocate this data.
+///
+/// Failure to call `vec_from_raw_parts` will lead to a memory leak.
+pub fn vec_into_raw_parts<T>(v: Vec<T>) -> (*mut T, usize) {
+    let mut b = v.into_boxed_slice();
+    let ptr = b.as_mut_ptr();
+    let len = b.len();
+    mem::forget(b);
+    (ptr, len)
+}
+
+/// Retakes ownership of a `Vec` that was transferred to C via `vec_into_raw_parts`.
+pub unsafe fn vec_from_raw_parts<T>(ptr: *mut T, len: usize) -> Vec<T> {
+    Box::from_raw(slice::from_raw_parts_mut(ptr, len)).into_vec()
+}
+
+/// Converts a pointer and length to `Vec` by cloning the contents.
+/// Note: This does NOT free the memory pointed to by `ptr`.
 pub unsafe fn vec_clone_from_raw_parts<T: Clone>(ptr: *const T, len: usize) -> Vec<T> {
     slice::from_raw_parts(ptr, len).to_vec()
 }
 
-/// Converts a Vec<T> to (pointer, size, capacity).
-pub fn vec_into_raw_parts<T>(mut v: Vec<T>) -> (*mut T, usize, usize) {
-    v.shrink_to_fit();
-    let ptr = v.as_mut_ptr();
-    let len = v.len();
-    let cap = v.capacity();
-    mem::forget(v);
-    (ptr, len, cap)
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn vec_conversions() {
+        for _ in 0..5 {
+            let v = vec!["foo", "bar"];
+
+            for _ in 0..5 {
+                let (ptr, len) = vec_into_raw_parts(v.clone());
+                let v2 = unsafe { vec_clone_from_raw_parts(ptr, len) };
+                assert_eq!(v, v2);
+                let v3 = unsafe { vec_from_raw_parts(ptr, len) };
+                assert_eq!(v, v3);
+            }
+        }
+    }
 }
