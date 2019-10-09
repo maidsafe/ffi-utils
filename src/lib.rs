@@ -84,7 +84,7 @@ pub use self::catch_unwind::{catch_unwind_cb, catch_unwind_result};
 pub use self::repr_c::ReprC;
 pub use self::result::{FfiResult, NativeResult, FFI_RESULT_OK};
 pub use self::string::{from_c_str, StringError};
-pub use self::vec::{vec_clone_from_raw_parts, vec_into_raw_parts, SafePtr};
+pub use self::vec::{vec_clone_from_raw_parts, vec_from_raw_parts, vec_into_raw_parts, SafePtr};
 
 use std::os::raw::c_void;
 
