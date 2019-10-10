@@ -1,5 +1,10 @@
 # FFI utils - Change Log
 
+## [0.13.0]
+- Make `vec_into_raw_parts` not return a capacity
+- Add `vec_from_raw_parts`
+- Remove `from_c_str`
+
 ## [0.12.0]
 - Use stable rustc, clippy, and rustfmt
 - Upgrade crate to Rust 2018 edition
