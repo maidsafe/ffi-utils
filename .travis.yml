@@ -21,9 +21,7 @@ before_script:
 script:
   - set -x;
     cargo fmt -- --check &&
-    cargo check --release &&
-    cargo clippy --release &&
-    cargo clippy --release --profile=test &&
-    cargo test --release --verbose
+    cargo clippy --verbose --release --all-targets &&
+    cargo test --verbose --release
 before_cache:
   - cargo prune
