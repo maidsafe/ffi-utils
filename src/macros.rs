@@ -15,17 +15,21 @@
 
 /// Convert an error into a pair of `(error_code: i32, description: String)` to be used in
 /// `NativeResult`.
+///
+/// The error must implement `Debug + Display`.
 #[macro_export]
 macro_rules! ffi_error {
     ($err:expr) => {{
         let err_code = ffi_error_code!($err);
-        let err_desc = format!("{}", $err);
+        let err_desc = $err.to_string();
         (err_code, err_desc)
     }};
 }
 
 /// Convert a result into a pair of `(error_code: i32, description: String)` to be used in
 /// `NativeResult`.
+///
+/// The error must implement `Debug + Display`.
 #[macro_export]
 macro_rules! ffi_result {
     ($res:expr) => {
@@ -36,7 +40,9 @@ macro_rules! ffi_result {
     };
 }
 
-/// Convert a result into an i32 error code.
+/// Convert a result into an `i32` error code.
+///
+/// The error must implement `Debug`.
 #[macro_export]
 macro_rules! ffi_result_code {
     ($res:expr) => {
@@ -47,7 +53,9 @@ macro_rules! ffi_result_code {
     };
 }
 
-/// Convert an error into an i32 error code.
+/// Convert an error into an `i32` error code.
+///
+/// The error must implement `Debug`.
 #[macro_export]
 macro_rules! ffi_error_code {
     ($err:expr) => {{
@@ -64,6 +72,8 @@ macro_rules! ffi_error_code {
 }
 
 /// Convert a result into an `FfiResult` and call a callback.
+///
+/// The error must implement `Debug + Display`.
 #[macro_export]
 macro_rules! call_result_cb {
     ($result:expr, $user_data:expr, $cb:expr) => {
@@ -95,6 +105,8 @@ macro_rules! call_result_cb {
 
 /// Given a result, calls the callback if it is an error, otherwise produces the wrapped value.
 /// Should be called within `catch_unwind`, so returns `None` on error.
+///
+/// The error must implement `Debug + Display`.
 #[macro_export]
 macro_rules! try_cb {
     ($result:expr, $user_data:expr, $cb:expr) => {
@@ -106,4 +118,28 @@ macro_rules! try_cb {
             }
         }
     };
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::test_utils::TestError;
+
+    #[test]
+    fn error_code_and_desc() {
+        {
+            let err = TestError::Test;
+            let (code, desc) = ffi_error!(err);
+
+            assert_eq!(code, -1);
+            assert_eq!(desc, "Test Error");
+        }
+
+        {
+            let err = TestError::from("howdy");
+            let (code, desc) = ffi_error!(err);
+
+            assert_eq!(code, -2);
+            assert_eq!(desc, "howdy".to_string());
+        }
+    }
 }

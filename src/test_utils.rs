@@ -345,6 +345,7 @@ impl<'a> From<&'a str> for TestError {
 impl ErrorCode for TestError {
     fn error_code(&self) -> i32 {
         use TestError::*;
+
         match *self {
             Test => -1,
             FromStr(_) => -2,
@@ -355,6 +356,7 @@ impl ErrorCode for TestError {
 impl Display for TestError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use TestError::*;
+
         match self {
             Test => write!(f, "Test Error"),
             FromStr(s) => write!(f, "{}", s),
