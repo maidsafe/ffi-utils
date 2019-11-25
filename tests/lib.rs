@@ -61,7 +61,11 @@
     variant_size_differences,
     clippy::implicit_hasher,
     clippy::too_many_arguments,
-    clippy::use_debug
+    clippy::use_debug,
+    // These functions specifically used for FFI are missing safety documentation.
+    // It is probably not necessary for us to provide this for every single function
+    // as that would be repetitive and verbose.
+    clippy::missing_safety_doc
 )]
 
 #[macro_use]
