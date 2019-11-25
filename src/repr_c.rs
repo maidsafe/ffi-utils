@@ -94,6 +94,9 @@ impl<T> ReprC for *mut T {
     }
 }
 
+// TODO: Replace these with a const generic implementation once it is stable.
+// https://github.com/rust-lang/rust/issues/44580
+
 impl ReprC for [u8; 24] {
     type C = *const [u8; 24];
     type Error = ();
@@ -112,11 +115,38 @@ impl ReprC for [u8; 32] {
     }
 }
 
+impl ReprC for [u8; 48] {
+    type C = *const [u8; 48];
+    type Error = ();
+
+    unsafe fn clone_from_repr_c(repr_c: Self::C) -> Result<Self, Self::Error> {
+        Ok(*repr_c)
+    }
+}
+
 impl ReprC for [u8; 64] {
     type C = *const [u8; 64];
     type Error = ();
 
     unsafe fn clone_from_repr_c(repr_c: Self::C) -> Result<Self, Self::Error> {
         Ok(*repr_c)
+    }
+}
+
+impl ReprC for [u8; 96] {
+    type C = *const [u8; 96];
+    type Error = ();
+
+    unsafe fn clone_from_repr_c(repr_c: Self::C) -> Result<Self, Self::Error> {
+        Ok(*repr_c)
+    }
+}
+
+impl ReprC for bool {
+    type C = u32;
+    type Error = ();
+
+    unsafe fn clone_from_repr_c(repr_c: Self::C) -> Result<Self, Self::Error> {
+        Ok(repr_c != 0)
     }
 }
