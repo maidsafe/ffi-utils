@@ -50,12 +50,20 @@ pub fn vec_into_raw_parts<T>(v: Vec<T>) -> (*mut T, usize) {
 }
 
 /// Retakes ownership of a `Vec` that was transferred to C via `vec_into_raw_parts`.
+///
+/// # Safety
+///
+/// Unsafe. See documentation for `slice::from_raw_parts_mut` and `Box::from_raw`.
 pub unsafe fn vec_from_raw_parts<T>(ptr: *mut T, len: usize) -> Vec<T> {
     Box::from_raw(slice::from_raw_parts_mut(ptr, len)).into_vec()
 }
 
 /// Converts a pointer and length to `Vec` by cloning the contents.
 /// Note: This does NOT free the memory pointed to by `ptr`.
+///
+/// # Safety
+///
+/// Unsafe. See documentation for `slice::from_raw_parts`.
 pub unsafe fn vec_clone_from_raw_parts<T: Clone>(ptr: *const T, len: usize) -> Vec<T> {
     slice::from_raw_parts(ptr, len).to_vec()
 }

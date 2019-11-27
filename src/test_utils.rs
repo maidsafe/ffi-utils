@@ -9,6 +9,11 @@
 
 //! Test utilities.
 
+// These functions specifically used for FFI are missing safety documentation.
+// It is probably not necessary for us to provide this for every single function
+// as that would be repetitive and verbose.
+#![allow(clippy::missing_safety_doc)]
+
 use crate::repr_c::ReprC;
 use crate::{ErrorCode, FfiResult};
 use std::fmt::{Debug, Display};
