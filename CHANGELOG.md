@@ -1,5 +1,9 @@
 # FFI utils - Change Log
 
+## [0.14.0]
+- Improve performance by removing unnecessary call to `format!`
+- Add ReprC impls for other array lengths and booleans
+
 ## [0.13.0]
 - Make `vec_into_raw_parts` not return a capacity
 - Add `vec_from_raw_parts`
