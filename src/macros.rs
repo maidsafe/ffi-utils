@@ -20,7 +20,7 @@
 #[macro_export]
 macro_rules! ffi_error {
     ($err:expr) => {{
-        let err_code = ffi_error_code!($err);
+        let err_code = $crate::ffi_error_code!($err);
         let err_desc = $err.to_string();
         (err_code, err_desc)
     }};
@@ -35,7 +35,7 @@ macro_rules! ffi_result {
     ($res:expr) => {
         match $res {
             Ok(_) => (0, String::default()),
-            Err(error) => ffi_error!(error),
+            Err(error) => $crate::ffi_error!(error),
         }
     };
 }
@@ -48,7 +48,7 @@ macro_rules! ffi_result_code {
     ($res:expr) => {
         match $res {
             Ok(_) => 0,
-            Err(error) => ffi_error_code!(error),
+            Err(error) => $crate::ffi_error_code!(error),
         }
     };
 }
@@ -82,7 +82,7 @@ macro_rules! call_result_cb {
         use $crate::callback::{Callback, CallbackArgs};
         use $crate::result::{FfiResult, NativeResult};
 
-        let (error_code, description) = ffi_result!($result);
+        let (error_code, description) = $crate::ffi_result!($result);
         let res = NativeResult {
             error_code,
             description: Some(description),
@@ -113,7 +113,7 @@ macro_rules! try_cb {
         match $result {
             Ok(value) => value,
             e @ Err(_) => {
-                call_result_cb!(e, $user_data, $cb);
+                $crate::call_result_cb!(e, $user_data, $cb);
                 return None;
             }
         }

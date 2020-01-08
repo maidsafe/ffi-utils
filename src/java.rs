@@ -62,19 +62,19 @@ macro_rules! jni_unwrap {
         match res {
             Ok(val) => val,
             Err(e) => {
-                error!("{:?}", e);
+                log::error!("{:?}", e);
                 return;
             }
         }
     }};
 }
 
-/// Generates a `user_data` context containing a reference to a single or several Java callbacks
+/// Generates a `user_data` context containing a reference to a single or several Java callbacks.
 #[macro_export]
 macro_rules! gen_ctx {
     ($env:ident, $cb:ident) => {
         {
-            let ctx = jni_unwrap!($env.new_global_ref($cb));
+            let ctx = $crate::jni_unwrap!($env.new_global_ref($cb));
             let ptr = *ctx.as_obj() as *mut c_void;
             mem::forget(ctx);
             ptr
@@ -84,9 +84,9 @@ macro_rules! gen_ctx {
     ($env:ident, $cb0:ident, $($cb_rest:ident),+ ) => {
         {
             let ctx = [
-                Some(jni_unwrap!($env.new_global_ref($cb0))),
+                Some($crate::jni_unwrap!($env.new_global_ref($cb0))),
                 $(
-                    Some(jni_unwrap!($env.new_global_ref($cb_rest))),
+                    Some($crate::jni_unwrap!($env.new_global_ref($cb_rest))),
                 )+
             ];
             let ctx = Box::into_raw(Box::new(ctx)) as *mut c_void;
@@ -113,7 +113,8 @@ macro_rules! gen_primitive_type_converter {
     };
 }
 
-/// Generate a `ToJava` impl that converts a slice of structures (`&[Foo]`) into a Java object array (`Foo[]`).
+/// Generate a `ToJava` impl that converts a slice of structures (`&[Foo]`) into a Java object array
+/// (`Foo[]`).
 #[macro_export]
 macro_rules! gen_object_array_converter {
     ($class_loader:expr, $native_type:ident, $java_ty_name:expr) => {
@@ -133,7 +134,8 @@ macro_rules! gen_object_array_converter {
     };
 }
 
-/// Generate a `ToJava` impl that converts a byte array (`[u8; 32]`) into a Java byte array (`byte[]`).
+/// Generate a `ToJava` impl that converts a byte array (`[u8; 32]`) into a Java byte array
+/// (`byte[]`).
 #[macro_export]
 macro_rules! gen_byte_array_converter {
     ($arr_type:ty, $size:expr) => {
@@ -161,7 +163,8 @@ macro_rules! gen_byte_array_converter {
     };
 }
 
-/// Converts object arrays into Java arrays
+/// Converts object arrays into Java arrays.
+#[allow(clippy::missing_safety_doc)]
 pub unsafe fn object_array_to_java<'a, T, U: Into<JObject<'a>> + 'a>(
     class_loader: unsafe fn(&'a JNIEnv, &str) -> JniResult<AutoLocal<'a>>,
     transform_fn: fn(&T, &'a JNIEnv) -> JniResult<U>,
@@ -182,6 +185,7 @@ pub unsafe fn object_array_to_java<'a, T, U: Into<JObject<'a>> + 'a>(
 }
 
 /// Converts `user_data` back into a Java callback object
+#[allow(clippy::missing_safety_doc)]
 pub unsafe fn convert_cb_from_java(env: &JNIEnv, ctx: *mut c_void) -> JniResult<GlobalRef> {
     Ok(GlobalRef::from_raw(env.get_java_vm()?, ctx as jobject))
 }
