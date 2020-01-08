@@ -1,7 +1,11 @@
 env:
   global:
+    # Run all cargo commands with --verbose.
+    - CARGO_TERM_VERBOSE=true
     - RUST_BACKTRACE=1
     - PATH=$PATH:$HOME/.cargo/bin
+    # Deny all compiler warnings.
+    - RUSTFLAGS="-D warnings"
 os:
   - linux
   - osx
@@ -21,7 +25,7 @@ before_script:
 script:
   - set -x;
     cargo fmt -- --check &&
-    cargo clippy --verbose --release --all-targets &&
+    ./scripts/clippy &&
     cargo test --verbose --release
 before_cache:
   - cargo prune

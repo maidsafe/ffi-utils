@@ -9,6 +9,7 @@
 
 use super::callback::{Callback, CallbackArgs};
 use super::{ErrorCode, FfiResult, NativeResult};
+use crate::ffi_result;
 use std::fmt::{Debug, Display};
 use std::os::raw::c_void;
 use std::panic::{self, AssertUnwindSafe};

@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set -e -x
+
+cargo clippy --verbose --all-targets
+cargo clippy --verbose --all-targets --features=java

@@ -26,6 +26,11 @@ pub trait ReprC {
     type Error;
 
     /// Convert from a raw FFI type into a native Rust type by cloning the data.
+    ///
+    /// # Safety
+    ///
+    /// The implementation of this function may be unsafe, as `repr_c` may be a raw pointer that
+    /// needs to be valid.
     unsafe fn clone_from_repr_c(repr_c: Self::C) -> Result<Self, Self::Error>
     where
         Self: Sized;

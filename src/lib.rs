@@ -27,13 +27,6 @@
 // This crate makes liberal use of unsafe code to work with FFI.
 #![allow(unsafe_code)]
 
-#[macro_use]
-mod macros;
-mod b64;
-mod catch_unwind;
-mod repr_c;
-mod vec;
-
 pub mod bindgen_utils;
 pub mod callback;
 #[cfg(feature = "java")]
@@ -41,6 +34,12 @@ pub mod java;
 pub mod result;
 pub mod string;
 pub mod test_utils;
+
+mod b64;
+mod catch_unwind;
+mod macros;
+mod repr_c;
+mod vec;
 
 pub use self::b64::{base64_decode, base64_encode};
 pub use self::catch_unwind::{catch_unwind_cb, catch_unwind_result};
