@@ -1,5 +1,8 @@
 # FFI utils - Change Log
 
+## [0.15.0]
+- Add full support for new macro import style in calling crates
+
 ## [0.14.0]
 - Improve performance by removing unnecessary call to `format!`
 - Add ReprC impls for other array lengths and booleans
