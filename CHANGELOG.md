@@ -1,5 +1,8 @@
 # FFI utils - Change Log
 
+# [0.16.0]
+- Update `walkdir` dependency
+
 ## [0.15.0]
 - Add full support for new macro import style in calling crates
 
