@@ -11,7 +11,6 @@
 
 use crate::repr_c::ReprC;
 use serde_derive::{Deserialize, Serialize};
-use std::error::Error;
 use std::ffi::{CStr, IntoStringError, NulError};
 use std::os::raw::c_char;
 use std::str::Utf8Error;
@@ -45,18 +44,18 @@ pub enum StringError {
 
 impl From<Utf8Error> for StringError {
     fn from(e: Utf8Error) -> Self {
-        StringError::Utf8(e.description().to_owned())
+        StringError::Utf8(e.to_string())
     }
 }
 
 impl From<NulError> for StringError {
     fn from(e: NulError) -> Self {
-        StringError::Null(e.description().to_owned())
+        StringError::Null(e.to_string())
     }
 }
 
 impl From<IntoStringError> for StringError {
     fn from(e: IntoStringError) -> Self {
-        StringError::IntoString(e.description().to_owned())
+        StringError::IntoString(e.to_string())
     }
 }
