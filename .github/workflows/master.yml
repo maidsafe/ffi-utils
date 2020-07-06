@@ -25,7 +25,8 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+      # Install Rust
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -33,31 +34,22 @@ jobs:
           override: true
 
       # Generate Cargo.lock, needed for the cache.
-      - uses: actions-rs/cargo@v1
-        with:
-          command: generate-lockfile
+      - name: Generate Cargo.lock
+        run: cargo generate-lockfile
+
       # Cache.
-      - name: Cache cargo registry
-        uses: actions/cache@v1
+      - name: Cargo cache registry, index and build
+        uses: actions/cache@v2
         with:
-          path: ~/.cargo/registry
-          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
-      - name: Cache cargo index
-        uses: actions/cache@v1
-        with:
-          path: ~/.cargo/git
-          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
-      - name: Cache cargo build
-        uses: actions/cache@v1
-        with:
-          path: target
-          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-cache-${{ hashFiles('**/Cargo.lock') }}
 
       # Make sure the code builds.
-      - uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release
+      - name: Cargo Build
+        run: cargo build --release
 
   publish:
     name: Publish
@@ -66,7 +58,11 @@ jobs:
     # Is this a version change commit?
     if: startsWith(github.event.head_commit.message, 'Version change')
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+      # checkout with fetch-depth: '0' to be sure to retrieve all commits to look for the semver commit message
+        with:
+          fetch-depth: '0'
+      # Install Rust
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -87,13 +83,9 @@ jobs:
           CUSTOM_TAG: ${{ steps.versioning.outputs.version }}
 
       # Publish to crates.io.
-      - uses: actions-rs/cargo@v1
-        with:
-          command: login
-          args: ${{ secrets.CRATES_IO_TOKEN }}
-      - uses: actions-rs/cargo@v1
-        with:
-          command: package
-      - uses: actions-rs/cargo@v1
-        with:
-          command: publish
+      - name: Cargo package
+        run: cargo package
+      - name: Cargo publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+        run: cargo publish --token $CARGO_REGISTRY_TOKEN
