@@ -22,7 +22,7 @@ unwrap = "1.2.0"
 walkdir = "2.3.1"
 
 [dev-dependencies]
-rand = "~0.4.2"
+rand = "0.7.3"
 
 [features]
 # Includes utilities for dealing with the JNI runtime.
