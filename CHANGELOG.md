@@ -1,5 +1,9 @@
 # FFI utils - Change Log
 
+# [0.17.0]
+- Log panics in logs
+- Update multiple dependencies
+
 # [0.16.0]
 - Update `walkdir` dependency
 
