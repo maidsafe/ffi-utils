@@ -10,6 +10,7 @@
 use super::callback::{Callback, CallbackArgs};
 use super::{ErrorCode, FfiResult, NativeResult};
 use crate::ffi_result;
+use log::debug;
 use std::fmt::{Debug, Display};
 use std::os::raw::c_void;
 use std::panic::{self, AssertUnwindSafe};
@@ -21,7 +22,14 @@ where
     E: Debug + From<&'a str>,
 {
     match panic::catch_unwind(AssertUnwindSafe(f)) {
-        Err(_) => Err(E::from("panic")),
+        Err(err) => match err.downcast::<String>() {
+            Ok(string) => {
+                let err_msg = format!("panic: {:?}", string);
+                debug!("{:?}", err_msg);
+                Err(E::from("panic"))
+            }
+            Err(_) => Err(E::from("panic")),
+        },
         Ok(result) => result,
     }
 }
