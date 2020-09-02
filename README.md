@@ -1,8 +1,8 @@
 # FFI Utils
 
-|Crate|Documentation|Linux/macOS|Windows|Issues|
-|:---:|:-----------:|:--------:|:-----:|:----:|
-|[![](http://meritbadge.herokuapp.com/ffi_utils)](https://crates.io/crates/ffi_utils)|[![Documentation](https://docs.rs/ffi_utils/badge.svg)](https://docs.rs/ffi_utils)|[![Build Status](https://travis-ci.com/maidsafe/ffi_utils.svg?branch=master)](https://travis-ci.com/maidsafe/ffi_utils)|[![Build status](https://ci.appveyor.com/api/projects/status/ex53u3atx6sqm9f2/branch/master?svg=true)](https://ci.appveyor.com/project/MaidSafe-QA/ffi-utils-u7qyi/branch/master)|[![Stories in Ready](https://badge.waffle.io/maidsafe/ffi_utils.png?label=ready&title=Ready)](https://waffle.io/maidsafe/ffi_utils)|
+|Crate|Documentation|
+|:---:|:-----------:|
+|[![](http://meritbadge.herokuapp.com/sn_ffi_utils)](https://crates.io/crates/sn_ffi_utils)|[![Documentation](https://docs.rs/sn_ffi_utils/badge.svg)](https://docs.rs/sn_ffi_utils)|
 
 | [MaidSafe website](https://maidsafe.net) | [SAFE Dev Forum](https://forum.safedev.org) | [SAFE Network Forum](https://safenetforum.org) |
 |:----------------------------------------:|:-------------------------------------------:|:----------------------------------------------:|

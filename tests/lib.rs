@@ -33,8 +33,8 @@
 // Test the basic example from our "FFI calling conventions" doc.
 #[test]
 fn basic() {
-    use ffi_utils::test_utils::TestError;
-    use ffi_utils::{catch_unwind_cb, FfiResult, OpaqueCtx, FFI_RESULT_OK};
+    use sn_ffi_utils::test_utils::TestError;
+    use sn_ffi_utils::{catch_unwind_cb, FfiResult, OpaqueCtx, FFI_RESULT_OK};
     use std::os::raw::c_void;
     use unwrap::unwrap;
 
@@ -62,7 +62,7 @@ fn basic() {
 
     // Test the example.
     {
-        use ffi_utils::test_utils::call_1;
+        use sn_ffi_utils::test_utils::call_1;
 
         // Test success case.
         let val: i32 = unsafe { unwrap!(call_1(|ud, cb| foreign_function(1, ud, cb))) };
@@ -82,9 +82,9 @@ fn basic() {
 // Test the utility functions as covered in "FFI calling conventions".
 #[test]
 fn utility_functions() {
-    use ffi_utils::call_result_cb;
-    use ffi_utils::test_utils::TestError;
-    use ffi_utils::{catch_unwind_cb, FfiResult, OpaqueCtx, FFI_RESULT_OK};
+    use sn_ffi_utils::call_result_cb;
+    use sn_ffi_utils::test_utils::TestError;
+    use sn_ffi_utils::{catch_unwind_cb, FfiResult, OpaqueCtx, FFI_RESULT_OK};
     use std::os::raw::c_void;
 
     // Function that returns a Result.
@@ -120,7 +120,7 @@ fn utility_functions() {
 
     // Test the example.
     {
-        use ffi_utils::NativeResult;
+        use sn_ffi_utils::NativeResult;
         use unwrap::unwrap;
         use utils::call_1_ffi_result;
 
@@ -145,8 +145,8 @@ fn utility_functions() {
 }
 
 mod utils {
-    use ffi_utils::test_utils::{send_via_user_data, sender_as_user_data, SendWrapper};
-    use ffi_utils::{FfiResult, NativeResult, ReprC};
+    use sn_ffi_utils::test_utils::{send_via_user_data, sender_as_user_data, SendWrapper};
+    use sn_ffi_utils::{FfiResult, NativeResult, ReprC};
     use std::fmt::Debug;
     use std::os::raw::c_void;
     use std::sync::mpsc;
