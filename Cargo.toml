@@ -1,12 +1,12 @@
 [package]
 authors = ["MaidSafe Developers <dev@maidsafe.net>"]
 description = "FFI utilities"
-documentation = "https://docs.rs/ffi_utils"
+documentation = "https://docs.rs/sn_ffi_utils"
 homepage = "https://maidsafe.net"
 license = "MIT OR BSD-3-Clause"
-name = "ffi_utils"
+name = "sn_ffi_utils"
 readme = "README.md"
-repository = "https://github.com/maidsafe/ffi-utils"
+repository = "https://github.com/maidsafe/sn_ffi_utils"
 version = "0.17.0"
 
 edition = "2018"
