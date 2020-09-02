@@ -1,5 +1,8 @@
 # FFI utils - Change Log
 
+# [0.18.0]
+- Update crate name to sn_ffi_utils
+
 # [0.17.0]
 - Log panics in logs
 - Update multiple dependencies
