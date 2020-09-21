@@ -1,4 +1,8 @@
-# FFI utils - Changelog
+# Changelog
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+### 0.18.1 (2020-09-21)
 
 ### [0.18.0](https://github.com/maidsafe/sn_ffi_utils/compare/0.17.0...0.18.0) (2020-09-02)
 * Update crate name to sn_ffi_utils
