@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.18.9](https://github.com/maidsafe/sn_ffi_utils/compare/v0.18.8...v0.18.9) (2021-03-03)
+
 ### [0.18.8](https://github.com/maidsafe/sn_ffi_utils/compare/v0.18.7...v0.18.8) (2021-02-25)
 
 ### [0.18.7](https://github.com/maidsafe/sn_ffi_utils/compare/v0.18.6...v0.18.7) (2021-02-10)
